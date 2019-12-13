@@ -1,0 +1,8 @@
+.block
+{
+    border-style: solid;
+    border: 2px solid black;
+    width: 10%;
+    height: 30px;
+    font-size: 100%;
+}
