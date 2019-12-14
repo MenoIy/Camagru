@@ -1,51 +1,50 @@
 <html>
-	<head>
-		<meta charset="utf-8" />
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>camagru</title>
-		<link rel="stylesheet" href="/view/register/register.css" />	
-	</head>
-    <div>
-			<form>
-				<input class="home_block" type="submit" name="url" value="home">
-				<input class="home_block" type="submit" name="url" value="login"/>
-				<input class="home_block" type="submit" name="url" value="register"/>
-				<input class="home_block" type="submit" name="url" value="reset_password"/>
-
-			</form>
-	</div>
-	<body class="body">
-		<center>
-			<div class="block_title">
-				<p class="title" >REGISTER</p>
-			</div>
-		<br />
-		<form method="POST" action='?url=register'>
-			<div>
-				<span class="champ">Login : </span><input placeholder="Login" class="block" type="text" name="login" value="" />
-			</div>
-			<br />
-			<div>
-				<span class="champ">Email : </span> <input placeholder="Email" class="block"type="text" name="mail" value="" />
-			</div>
-			<br />
-			<div>
-				<span class="champ">Password : </span> <input placeholder="Password" class="block" type="password" name="passwd" value="" />
-			</div>
-			<br />
-			<div>
-				<input class="button" type="submit" name="submit" value="REGISTER" />
-			</div>
-
-			<?php if (isset($errors["error_type"])): ?>
-					<p class="message error">
+		<link rel="stylesheet" href="/view/register/register.css"/>
+    </head>
+    <body>
+            <div class="header">
+                <p1 class="title"><img class="logo" src="./icon1.png"/>Camagru</p1>
+                <div class="header-page">
+                    <a class="active" href="?url=home">Home</a>
+                    <?php if (!isset($_SESSION["loggued_on_user"])): ?>
+                        <a href="?url=login"/>Login</a>
+                    <?php endif; ?>
+                    <?php if (!isset($_SESSION["loggued_on_user"])): ?>
+                        <a href="?url=register"/>Register</a>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION["loggued_on_user"])): ?>
+                        <a href="?url=profile"/>profile</a>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION["loggued_on_user"])): ?>
+                        <a href="?url=camera"/>Camera</a>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <div>
+            <form method="POST" action='?url=register'>
+                <div class="container">
+                    <label for="username"><b>Username</b></label>
+					<input type="text" placeholder="Enter Username" name="username" required>
+					<label for="email"><b>Address email</b></label>
+                    <input type="text" placeholder="Enter Address Email" name="email" required>
+                    <label for="password"><b>Password</b></label>
+                    <input type="password" placeholder="Enter Password" name="password" required>
+                    <button type="submit">Register</button>
+                </div>
+                <?php if (isset($errors["error_type"])): ?>
+					<p class="Error">
 						<?= $errors["error_type"]?>
 					</p>
-			<?php endif; ?>
-		</form>
-		</center>
-	</body>
-	<footer style="display: block;">
-        <hr>
-        <p style="text-align:right;font-family:monospace;"><i>&#169; kdaou camagru</i></p>
-    </footer>
+			    <?php endif; ?>
+            </form>
+            </div>
+            <footer>
+                <p style="text-align:right;font-family:monospace;"><i>&#169; kdaou camagru</i></p>
+            </footer>
+
+    </body>
 </html>

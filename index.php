@@ -20,7 +20,7 @@ if (isset($_SERVER['REQUEST_URI']))
 if (isset($_SESSION['loggued_on_user']) &&
     (strcmp($url, "login") == 0 || (strcmp($url, "register") == 0) || (strcmp($url, "reset") == 0)))
     $url = "home";
-else if (!isset($_SESSION['loggued_on_user']) && (strcmp($url, "profile") == 0 || strcmp($url, "camera") == 0))
+else if (!isset($_SESSION['loggued_on_user']) && (strcmp($url, "camera") == 0))
         $url = "home";
 
 switch ($url)
