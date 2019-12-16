@@ -78,3 +78,111 @@ footer
     color: #502B07;
     text-align: center;
 }
+
+
+.image
+{
+    display: block;
+    margin-top: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    width : 100%;
+    max-width: 600px;
+}
+
+ .image img
+{
+    width : 100%;
+    max-height : 600px;
+    max-width: 600px;
+    height: 100%;
+    border-style: solid;
+    border-color: #502B07;
+    border-radius: 5px;
+
+}
+.comment_button
+{
+    border-style: solid;
+    border-color: #502B07;
+    color : #502B07;
+    border-radius: 5px;
+    font-family: cursive;
+    font-size:15px;
+    width : 80%;
+    background-color :#CBAA84;
+}
+.hidden
+{
+    display: none;
+}
+
+.comments
+{
+    border-style: solid;
+    color : #502B07;
+    border-color: #502B07;
+    font-family: sans-serif;
+    border-radius: 5px;
+    overflow: scroll;
+    height: 100px;
+    overflow-x: hidden;
+}
+.comments hr
+{
+    border-top: 1px solid #CBAA84;
+}
+
+.input input
+{
+    border-style: solid;
+    border-color: #502B07; 
+    border-radius: 5px;
+    height: 50px;
+    width:80%;
+}
+.input button
+{
+    border-style: solid;
+    color : #502B07;
+    border-color: #502B07;  
+    border-radius: 5px;
+    font-family: cursive;
+    font-size: 20px;
+    background-color: #CBAA84;
+    height: 50px;
+    width:19%;
+}
+
+.like
+{
+    border-style: solid;
+    border-color: #502B07;
+    border-radius: 5px;
+    font-family: cursive;
+    width : 19%;
+    background-color  :#F2D7B8;
+    color : #502B07;
+    font-family: 'Sofia';
+    font-size: 19px;
+    margin-top:1px;
+}
+.like_active
+{
+    width : 19%;
+    color : #502B07;
+    font-size: 21px;
+    margin-top: 1px;
+}
+
+.like_nonactive
+{
+    width : 19%;
+    color : #502B07;
+    font-size: 17px;
+    margin-top: 1px; 
+}
+.like_form
+{
+    display: inline;
+}

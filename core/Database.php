@@ -41,12 +41,21 @@ class Database
         $ret = $statement->execute($data);
         return $ret;
     }
-    public function select($query, $data)
+
+    public function select($query, $data = [])
     {
         $statement = $this->getPDO()->prepare($query);
         $ret = $statement->execute($data);
         $select = $statement->fetch(PDO::FETCH_ASSOC);
         return ($select);
+    }
+
+    public function selectAll($query, $data = [])
+    {
+        $statement = $this->getPDO()->prepare($query);
+        $statement->execute($data);
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+        return ($result);
     }
 
     public function close()

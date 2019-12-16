@@ -35,6 +35,24 @@ class UserController
         return NULL;
     }
 
+    public function like($data)
+    {
+        if (!(isset($_SESSION['loggued_on_user'])))
+            return null;
+        else
+            var_dump($data);
+        return ( [" er"=> "good"]);
+    }
+    public function comment($data)
+    {
+        if (!(isset($_SESSION['loggued_on_user'])))
+            return null;
+        else
+            var_dump($data);
+        return ( [" er"=> "good"]);
+    }
+
+
 
     private function _sendConfirmationMail($UserModel, $login, $mail)
     {       
