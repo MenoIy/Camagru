@@ -10,8 +10,7 @@ const save = document.getElementById('save');
 
 
 
-function takePreview(img)
-{
+function takePreview(img) {
     var context = canvas.getContext('2d');
     canvas.width = 500;
     canvas.height = 500;
@@ -19,9 +18,8 @@ function takePreview(img)
     var data = canvas.toDataURL('image/png');
     console.log(img);
     if (img)
-        context.drawImage(img,100, 100, 100, 100 );
-    save.addEventListener('click', function()
-    {
+        context.drawImage(img, 100, 100, 100, 100);
+    save.addEventListener('click', function () {
         var element = document.getElementById('data');
         var superpos = document.getElementById('superpos');
         superpos.value = '0';
@@ -34,17 +32,15 @@ function takePreview(img)
 
 
 
-function startup()
-{
-    navigator.mediaDevices.getUserMedia(
-        {
-            audio : false,
-            video : true
-        }).then(stream => {
-        
-            video.srcObject = stream;
-            video.play();
-        }).catch(console.error);
+function startup() {
+    navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: true
+    }).then(stream => {
+
+        video.srcObject = stream;
+        video.play();
+    }).catch(console.error);
 }
 video.addEventListener('canplay', function () {
     video.setAttribute('width', 500);
@@ -54,8 +50,7 @@ video.addEventListener('canplay', function () {
 });
 window.addEventListener('load', startup, false);
 
-img1.addEventListener('click', function()
-{
+img1.addEventListener('click', function () {
     var element = document.getElementById("1");
     takePreview(element);
 });
