@@ -35,5 +35,12 @@ class Validator
             return TRUE;
         return FALSE;
     }
+    public function isComment($data)
+    {
+        if (!(is_array($data)))
+            return FALSE;
+        else 
+            return TRUE;
+    }
 }
 ?>

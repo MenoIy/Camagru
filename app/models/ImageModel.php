@@ -20,8 +20,29 @@ class ImageModel
 	public function getComments($image)
 	{
 		$this->_database->execute("Use db_camagru", ['']);
-		$query = "SELECT * from comments WHERE `filename` = ?";
+		$query = "SELECT * from comments WHERE `filename` = ?  ORDER BY `id` DESC";
 		$comments = $this->_database->selectAll($query, [$image]);
 		return $comments;	
 	}
+
+	public function getLikeCount($filename)
+    {
+        $query = "SELECT COUNT(*) FROM likes WHERE `filename` = ?";
+        $like = $this->_database->select($query, [$filename]);
+        if (!$like)
+            return null;
+        else
+            return ($like['COUNT(*)']);
+	}
+	
+	public function AlreadyLiked($user, $filename)
+	{
+		$query = "SELECT COUNT(*) FROM likes WHERE `filename` = ? AND `user` = ?";
+        $like = $this->_database->select($query, [$filename, $user]);
+        if (!$like)
+            return null;
+        else
+            return ($like['COUNT(*)']);	
+	}
+
 }

@@ -4,11 +4,13 @@ class UserController
 {
     private $_UserModel;
     private $_Validator;
+    private $_ImageModel;
 
     public function __construct($db)
     {
         $this->_UserModel = new UserModel($db);
         $this->_Validator = new Validator();
+        $this->_ImageModel = new ImageModel($db);
         $db->execute("Use db_camagru", ['']);
     }
 
@@ -38,18 +40,29 @@ class UserController
     public function like($data)
     {
         if (!(isset($_SESSION['loggued_on_user'])))
-            return null;
+            return (["error_type"=> "Login to like"]);
         else
-            var_dump($data);
-        return ( [" er"=> "good"]);
+        {
+            if ($this->_ImageModel->AlreadyLiked($_SESSION['loggued_on_user'], $data['image']) == 1)
+                $this->_UserModel->deleteLike($_SESSION['loggued_on_user'], $data['image']);
+            else
+                $this->_UserModel->addLike($_SESSION['loggued_on_user'], $data['image']);
+        }
+        return (null);
     }
     public function comment($data)
     {
         if (!(isset($_SESSION['loggued_on_user'])))
-            return null;
+            return (["error_type"=> "Login to comment"]);
         else
-            var_dump($data);
-        return ( [" er"=> "good"]);
+        {
+            if (!($this->_Validator->isComment($data)))
+            {
+                return (null);
+            }
+            $this->_UserModel->addComment($data['comment'], $_SESSION['loggued_on_user'], $data['image']);
+        }
+        return (null);
     }
 
 

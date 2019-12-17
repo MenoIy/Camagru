@@ -68,7 +68,7 @@ switch ($url)
 
     case "home":
     {
-        $error = [''];
+        $error = null;
         switch($method)
         {
             case "POST" :
@@ -88,9 +88,9 @@ switch ($url)
             }break;
         }
         if (isset($error))
-            require(__DIR__. '/view/home/home.php');
+            require(__DIR__. '/view/login/login.php');
         else
-            require(__DIR__ . '/view/login/login.php');
+            require(__DIR__ . '/view/home/home.php');
     } break ;
     case "verify" :
     {

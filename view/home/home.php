@@ -32,15 +32,22 @@
             </div>
             <div class = "imagesList" id="imagesList">
             <?php
-            foreach ($images as $image):
+                foreach ($images as $image):
+                $count = $imageModel->getLikeCount($image['filename']);
             ?>
             <div class="image">
                 <img src=<?= "$images_path/$image[filename]"?> />
                 <button class="comment_button"onclick="showComment('<?php echo $image['filename'] ?>')">Comment</button>
                     <form class="like_form" method="POST" action="?url=home">
                         <button type= "submit" class="like" name="like" value="like">
-                        <span class="like_nonactive">&#x2661;</span> <span class="like_active">&#x2665;</span><span> 0<span>
+                        <?php if ($imageModel->AlreadyLiked($_SESSION['loggued_on_user'], $image['filename']) == 0): ?>
+                            <span class="like_nonactive">&#x2661;</span>
+                        <?php else: ?>
+                            <span class="like_active">&#x2665;</span>
+                        <?php endif; ?>
+                        <span><?="$count"?><span>
                         <input type="hidden" name="action" value="like" />
+                        <input type="hidden" name="image" value=<?= "$image[filename]"?> />
                     </button>
             </form>
                 <div class="hidden"id=<?= "$image[filename]" ?>>
@@ -48,8 +55,9 @@
                     <?php
                        $comments = $imageModel->getComments($image['filename']);
                        foreach ($comments as $comment):
+                       $commentaire = htmlspecialchars($comment['comment']);
                     ?>
-                    <h5><?= "$comment[user] : $comment[comment]"
+                    <h5><?= "$comment[user] : $commentaire"
                         ?></h5>
                     <?php
                          endforeach;
@@ -60,6 +68,7 @@
                         <input type="text" placeholder="Enter a Comment" name="comment" required>
                         <button type="submit">OK</button>
                         <input type="hidden" name="action" value="comment" />
+                        <input type="hidden" name="image" value=<?= "$image[filename]"?> />
                     </form>
                 </div>
                 </div>

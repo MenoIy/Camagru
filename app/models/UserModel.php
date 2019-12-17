@@ -167,4 +167,37 @@ class UserModel
         else
             return FALSE;   
     }
+    public function addComment($comment, $user, $filename)
+    {
+        $query = "INSERT INTO comments SET `comment` = ?, `user` = ? , `filename` = ?"; 
+        if ($this->_database->execute($query, [$comment, $user, $filename]))
+        {
+            return TRUE;
+        }
+        else
+            return FALSE;  
+    }
+
+    public function addLike($user, $filename)
+    {
+        $query = "INSERT INTO likes SET `filename` = ?, `user` = ? "; 
+        if ($this->_database->execute($query, [$filename, $user]))
+        {
+            return TRUE;
+        }
+        else
+            return FALSE;  
+    }
+
+    public function deleteLike($user, $filename)
+    {
+        $query = "DELETE FROM likes WHERE `filename` = ? AND `user` = ? "; 
+        if ($this->_database->execute($query, [$filename, $user]))
+        {
+            return TRUE;
+        }
+        else
+            return FALSE; 
+    }
+
 }
