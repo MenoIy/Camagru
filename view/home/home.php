@@ -28,6 +28,9 @@
                     <?php if (isset($_SESSION["loggued_on_user"])): ?>
                         <a href="?url=camera"/>Camera</a>
                     <?php endif; ?>
+                    <?php if (isset($_SESSION["loggued_on_user"])): ?>
+                        <a href="?url=logout"/>Logout</a>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class = "imagesList" id="imagesList">

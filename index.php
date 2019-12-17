@@ -6,7 +6,7 @@ require_once("./app/models/ImageModel.php");
 require_once('./config/database.php');
 require_once("./core/Database.php");
 require_once("./core/Validator.php");
-require_once("./core/Picture.php");
+require_once("./app/controllers/ImageController.php");
 require_once("./core/Picture.php");
 
 
@@ -183,11 +183,21 @@ switch ($url)
     {
             switch ($method)
             {
-                case "POST":
-                {
-                    $Picture = new Picture;
-                    $Picture->savePictureLocal($_POST['data'], $_SESSION['loggued_on_user']);
-                }break;
+                case "POST" :
+                    {
+                        $ImageController = new ImageController($db);
+                        switch($_POST['action'])
+                        {
+                            case "delete" :
+                            {
+                                $ImageController->deleteImage($_POST);
+                            }break;
+                            case "save":
+                            {
+                                $ImageController->saveImage($_POST, $_SESSION['loggued_on_user']);
+                            }break;
+                        }
+                    }break;
             }
             require(__DIR__ . '/view/camera/camera.php');
     } break ;
@@ -202,3 +212,8 @@ if (isset($_SESSION['loggued_on_user']))
 else
     echo "";
 ?>
+<script>
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>

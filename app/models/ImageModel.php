@@ -12,7 +12,7 @@ class ImageModel
 	public function getImages()
 	{   
 		$this->_database->execute("Use db_camagru", ['']);
-		$query = 'SELECT * from images';
+		$query = 'SELECT * from images ORDER BY `id` DESC';
 		$images = $this->_database->selectAll($query);
 		return $images;
 	}
@@ -45,4 +45,43 @@ class ImageModel
             return ($like['COUNT(*)']);	
 	}
 
+	public function addImage($filename, $user)
+	{
+		$query = "INSERT INTO `images` SET `user` = ? , `filename` = ?"; 
+        if ($this->_database->execute($query, [$user, $filename]))
+        {
+            return TRUE;
+        }
+        else
+            return FALSE;
+	}
+
+	private function _deleteComments($filename)
+	{
+		$query = "DELETE FROM comments WHERE `filename` = ?";
+		if ($this->_database->execute($query, [$filename]))
+			return TRUE;
+        else
+        return FALSE;	
+	}
+
+	private function _deleteLikes($filename)
+	{
+		$query = "DELETE FROM likes WHERE `filename` = ?";
+		if ($this->_database->execute($query, [$filename]))
+			return TRUE;
+		else
+			return FALSE;
+	}
+
+	public function deleteImage($filename)
+	{
+		$this->_deleteComments($filename);
+		$this->_deleteLikes($filename);
+		$query = "DELETE FROM images WHERE `filename` = ?";
+		if ($this->_database->execute($query, [$filename]))
+			return TRUE;
+        else
+        return FALSE;
+	}
 }

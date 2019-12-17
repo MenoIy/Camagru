@@ -1,0 +1,26 @@
+<div>
+			<form id="saveForm" method="POST" action="">
+			<input type="hidden" id="data", name="data">
+		</form>
+		<div class="camera">
+				<video class="video" id="video"></video>
+				<div>   
+			<button id="setImage1">
+				<img src="./public/superposables/dumb.png" alt="Smiley face" height="42" width="42" id = "1">
+			</button>
+
+			<button id="setImage2">
+			<img src="./public/superposables/dumb.png" alt="Smiley face" height="42" width="42" id = "2">
+			</button>
+
+			<button id="setImage3">
+			<img src="./public/superposables/dumb.png" alt="Smiley face" height="42" width="42" id = "3">
+			</button>
+			<button id="noImage">Screen</button>
+		<div>
+			<canvas id= "canvas"  ></canvas>
+		</div>
+		<div>
+			<button id="save">save picture</button>
+		</div>
+            </div>

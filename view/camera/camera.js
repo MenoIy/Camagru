@@ -16,15 +16,17 @@ function takePreview(img)
     canvas.width = 500;
     canvas.height = 500;
     context.drawImage(video, 0, 0, 500, 500);
+    var data = canvas.toDataURL('image/png');
+    console.log(img);
     if (img)
         context.drawImage(img,100, 100, 100, 100 );
-    
-    var data = canvas.toDataURL('image/png');
-    //  photo.setAttribute('src', data);
     save.addEventListener('click', function()
     {
         var element = document.getElementById('data');
+        var superpos = document.getElementById('superpos');
+        superpos.value = '0';
         element.value = data;
+        superpos.form.submit();
         element.form.submit();
     });
 }
@@ -56,19 +58,4 @@ img1.addEventListener('click', function()
 {
     var element = document.getElementById("1");
     takePreview(element);
-});
-img2.addEventListener('click', function()
-{
-    var element = document.getElementById("2");
-    takePreview(element);
-});
-img3.addEventListener('click', function()
-{
-    var element = document.getElementById("2");
-    takePreview(element);
-});
-
-noImg.addEventListener('click', function()
-{
-    takePreview(null);
 });

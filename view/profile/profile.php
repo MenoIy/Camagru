@@ -3,7 +3,7 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>camagru</title>
-		<link rel="stylesheet" href="/view/register/register.css"/>
+		<link rel="stylesheet" href="/view/profile/profile.css"/>
     </head>
     <body>
             <div class="header">
@@ -21,6 +21,9 @@
                     <?php endif; ?>
                     <?php if (isset($_SESSION["loggued_on_user"])): ?>
                         <a href="?url=camera"/>Camera</a>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION["loggued_on_user"])): ?>
+                        <a href="?url=logout"/>Logout</a>
                     <?php endif; ?>
                 </div>
             </div>

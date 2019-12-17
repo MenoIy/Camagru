@@ -3,12 +3,20 @@ CREATE DATABASE IF NOT EXISTS `db_camagru`;
 
 USE `db_camagru`;
 
+CREATE TABLE `likes`
+(
+    `id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `user` varchar(24) NOT NULL,
+    `filename` varchar(255) NOT NULL
+);
+
 CREATE TABLE camagru_users
 (
     `user_id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `user_login` varchar(24),
     `user_mail` varchar(255),
     `user_password` varchar(255),
+    `notification` varchar(10),
     `account_status` varchar(15)
 );
 
@@ -32,10 +40,4 @@ CREATE TABLE comments
     `comment` varchar(500) NOT NULL,
     `user` varchar(24) NOT NULL,
     `filename` varchar(255) NOT NULL
-);
-CREATE TABLE likes
-(
-    `id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `user` varchar(24) NOT NULL,
-    `filename` varchar(255) NOT NULL,
 );
