@@ -2,6 +2,7 @@
 
 require_once("./app/controllers/UserController.php");
 require_once("./app/models/UserModel.php");
+require_once("./app/controllers/ImageController.php");
 require_once("./app/models/ImageModel.php");
 require_once('./config/database.php');
 require_once("./core/Database.php");
@@ -12,7 +13,6 @@ require_once("./core/Picture.php");
 
 session_start();
 
-$_SESSION['loggued_on_user'] = 'menoly';
 
 $db = new Database();
 $url = 'home';
@@ -73,16 +73,16 @@ switch ($url)
 		{
 			case "POST" :
 			{
-				$UserController = new UserController($db);
+				$imageController = new ImageController($db);
 				switch($_POST['action'])
 				{
 					case "like" :
 					{
-						$error = $UserController->like($_POST);
+						$error = $imageController->like($_POST);
 					}break;
 					case "comment":
 					{
-						$error = $UserController->comment($_POST);  
+						$error = $imageController->comment($_POST);  
 					}break;
 				}
 			}break;

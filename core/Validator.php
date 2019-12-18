@@ -1,45 +1,36 @@
 <?php
 class Validator
 {
-    public function isLogin($login)
+    public function isUser($data)
     {
-        $ret = preg_match('/^[A-Za-z0-9]{6,24}+$/', $login);
+        $ret = preg_match('/^[A-Za-z0-9]{6,24}+$/', $data['user']);
         if ($ret)
             return TRUE;
         else
             return FALSE;
     }
     
-    public function isPassword($password)
+    public function isPassword($data)
     {
-        $ret = preg_match('/^[A-Za-z0-9]{6,24}+$/', $password);
+        $ret = preg_match('/^[A-Za-z0-9]{6,24}+$/', $data['password']);
         if ($ret)
             return TRUE;
         else
             return FALSE;
     }    
 
-    public function isMail($mail)
+    public function isMail($data)
     {
-        $ret = preg_match('/^\w+@\w+\..{2,3}(.{2,3})?$/', $mail);
+        $ret = preg_match('/^\w+@\w+\..{2,3}(.{2,3})?$/', $data['mail']);
         if ($ret)
             return TRUE;
         else
             return FALSE;
     }
-
-    public function isAlreadyRegistred($login, $userModel)
-    {
-        $user = $userModel->getUserByLogin($login);
-        if (isset($user))
-            return TRUE;
-        return FALSE;
-    }
+    
     public function isComment($data)
     {
-        if (!(is_array($data)))
-            return FALSE;
-        else 
+
             return TRUE;
     }
 }

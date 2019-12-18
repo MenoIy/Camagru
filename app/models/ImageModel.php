@@ -9,79 +9,85 @@ class ImageModel
         $this->_database = $db_instance;
 	}
 	
-	public function getImages()
-	{   
-		$this->_database->execute("Use db_camagru", ['']);
-		$query = 'SELECT * from images ORDER BY `id` DESC';
-		$images = $this->_database->selectAll($query);
-		return $images;
-	}
-
-	public function getComments($image)
+	public function saveImage($user, $filename)
 	{
-		$this->_database->execute("Use db_camagru", ['']);
-		$query = "SELECT * from comments WHERE `filename` = ?  ORDER BY `id` DESC";
-		$comments = $this->_database->selectAll($query, [$image]);
-		return $comments;	
+		$query = "INSERT INTO `images` set `user` = ?, `filename` = ?";
+		if ($this->_database->execute($query, [$user, $filename]))
+			return true;
+		else
+			return false;
 	}
 
-	public function getLikeCount($filename)
-    {
-        $query = "SELECT COUNT(*) FROM likes WHERE `filename` = ?";
-        $like = $this->_database->select($query, [$filename]);
-        if (!$like)
-            return null;
-        else
-            return ($like['COUNT(*)']);
+	public function deleteImage($filename)
+	{
+		$query = "DELETE FROM images WHERE `filename` = ?";
+		if (!($this->_database->execute($query, [$filename])))
+			return FALSE;
+		$query = "DELETE FROM likes WHERE `filename` = ?";
+		if (!($this->_database->execute($query, [$filename])))
+			return FALSE;
+			$query = "DELETE FROM comments WHERE `filename` = ?";
+		if (!($this->_database->execute($query, [$filename])))
+			return FALSE;
+		return TRUE;
 	}
-	
-	public function AlreadyLiked($user, $filename)
+
+	public function alreadyLiked($user, $filename)
 	{
 		$query = "SELECT COUNT(*) FROM likes WHERE `filename` = ? AND `user` = ?";
-        $like = $this->_database->select($query, [$filename, $user]);
-        if (!$like)
-            return null;
-        else
-            return ($like['COUNT(*)']);	
+		if (!($like = $this->_database->select($query, [$filename, $user])))
+			return null;
+		return ($like['COUNT(*)']);
 	}
 
-	public function addImage($filename, $user)
-	{
-		$query = "INSERT INTO `images` SET `user` = ? , `filename` = ?"; 
-        if ($this->_database->execute($query, [$user, $filename]))
-        {
+	public function addLike($user, $filename)
+    {
+        $query = "INSERT INTO likes SET `filename` = ?, `user` = ? "; 
+        if ($this->_database->execute($query, [$filename, $user]))
             return TRUE;
-        }
         else
-            return FALSE;
-	}
+            return FALSE;  
+    }
 
-	private function _deleteComments($filename)
+	private function deleteLikes($user, $filename)
 	{
-		$query = "DELETE FROM comments WHERE `filename` = ?";
-		if ($this->_database->execute($query, [$filename]))
-			return TRUE;
-        else
-        return FALSE;	
-	}
-
-	private function _deleteLikes($filename)
-	{
-		$query = "DELETE FROM likes WHERE `filename` = ?";
-		if ($this->_database->execute($query, [$filename]))
+		$query = "DELETE FROM likes WHERE `filename` = ? AND `user` = ?";
+		if ($this->_database->execute($query, [$filename, $user]))
 			return TRUE;
 		else
 			return FALSE;
 	}
 
-	public function deleteImage($filename)
+    public function addComment($comment, $user, $filename)
+    {
+        $query = "INSERT INTO comments SET `comment` = ?, `user` = ? , `filename` = ?"; 
+        if ($this->_database->execute($query, [$comment, $user, $filename]))
+            return TRUE;
+        return FALSE;  
+	}
+	
+	public function getImages()
 	{
-		$this->_deleteComments($filename);
-		$this->_deleteLikes($filename);
-		$query = "DELETE FROM images WHERE `filename` = ?";
-		if ($this->_database->execute($query, [$filename]))
-			return TRUE;
-        else
-        return FALSE;
+		$query = 'SELECT * from images ORDER BY `id` DESC';
+		if (!($images = $this->_database->selectAll($query)))
+			return null;
+		return (count($images) == 0 ? null : $images);
+	}
+
+	public function getComments($filename)
+	{
+		$query = "SELECT * from comments WHERE `filename` = ?  ORDER BY `id` DESC";
+		if (!($comments = $this->_database->selectAll($query, [$filename])))
+			return null;
+		return (count($comments) == 0 ? null : $comments);
+	}
+
+	public function getLikeCount($filename)
+	{
+		$query = "SELECT COUNT(*) FROM likes WHERE `filename` = ?";
+		if (!($likes = $this->_database->select($query, [$filename])))
+			return null;
+		else
+			return ($likes['COUNT(*)']);
 	}
 }

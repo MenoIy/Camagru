@@ -10,31 +10,32 @@ CREATE TABLE `likes`
     `filename` varchar(255) NOT NULL
 );
 
-CREATE TABLE camagru_users
+CREATE TABLE `users`
 (
-    `user_id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `user_login` varchar(24),
-    `user_mail` varchar(255),
-    `user_password` varchar(255),
+    `id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `user` varchar(24),
+    `mail` varchar(255),
+    `password` varchar(255),
     `notification` varchar(10),
-    `account_status` varchar(15)
+    `status` varchar(10)
 );
 
-CREATE TABLE camagru_account
+CREATE TABLE `accounts`
 (
-    `user_id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `account_login` varchar(24),
-    `account_mail` varchar(255),
-    `account_token` varchar(255)
+    `id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `user` varchar(24),
+    `mail` varchar(255),
+    `token` varchar(255)
 );
-/* FOREIGN KEY REFERENCES `camagru_users`(`user_id`) ON DELETE CASCADE*/
-CREATE TABLE images
+
+CREATE TABLE `images`
 (
     `id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `user` varchar(24) NOT NULL,
     `filename` varchar(255) NOT NULL
 );
-CREATE TABLE comments
+
+CREATE TABLE `comments`
 (
     `id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `comment` varchar(500) NOT NULL,

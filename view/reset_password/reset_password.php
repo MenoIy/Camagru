@@ -30,7 +30,7 @@
         <form method="POST" action='?url=reset_password'>
             <div class="container">
                 <label for="username"><b>Username</b></label>
-                <input type="text" placeholder="Enter Username" name="username" required>
+                <input type="text" placeholder="Enter Username" name="user" required>
                 <label for="email"><b>Address email</b></label>
                 <input type="text" placeholder="Enter Address email" name="mail" required>
                 <button type="submit">RESET</button>

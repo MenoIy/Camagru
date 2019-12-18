@@ -43,10 +43,10 @@ function startup() {
     }).catch(console.error);
 }
 video.addEventListener('canplay', function () {
-    video.setAttribute('width', 500);
-    video.setAttribute('height', 500);
-    canvas.setAttribute('width', 500);
-    canvas.setAttribute('height', 500);
+    video.setAttribute('width', 600);
+    video.setAttribute('height', 600);
+    canvas.setAttribute('width', 600);
+    canvas.setAttribute('height', 600);
 });
 window.addEventListener('load', startup, false);
 

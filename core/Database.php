@@ -19,7 +19,7 @@ class Database
         $this->_pdo = null;
     }
 
-    private function getPDO()
+    private function _getPDO()
     {
         if ($this->_pdo === null)
         {
@@ -27,7 +27,7 @@ class Database
                 $pdo = new PDO("$this->_dns", "$this->_username", "$this->_password");
             } 
             catch (\Throwable $error) {
-                var_dump ($error);
+                return null;
             }
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->_pdo = $pdo;
@@ -35,27 +35,52 @@ class Database
         return $this->_pdo;
     }
 
-    public function execute($query, $data)
+    public function execute($query, $data = [])
     {
-        $statement = $this->getPDO()->prepare($query);
+        if (!($PDO = $this->_getPDO()))
+            return false;
+        try {
+            $statement = $PDO->prepare($query);
+        }
+        catch (\Throwable $error){
+            return (false);
+        }
         $ret = $statement->execute($data);
         return $ret;
     }
 
     public function select($query, $data = [])
     {
-        $statement = $this->getPDO()->prepare($query);
-        $ret = $statement->execute($data);
-        $select = $statement->fetch(PDO::FETCH_ASSOC);
-        return ($select);
+        if (!($PDO = $this->_getPDO()))
+            return null;
+        try {
+          $statement = $PDO->prepare($query);
+        }
+        catch (\Throwable $error){
+            return (null);
+        }
+        if (!($statement->execute($data)))
+            return null;
+        if (!($select = $statement->fetch(PDO::FETCH_ASSOC)))
+            return null;
+        return $select;
     }
 
     public function selectAll($query, $data = [])
     {
-        $statement = $this->getPDO()->prepare($query);
-        $statement->execute($data);
-        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-        return ($result);
+        if (!($PDO = $this->_getPDO()))
+            return null;
+        try {
+            $statement = $PDO->prepare($query);
+        }
+        catch (\Throwable $error){
+            return (null);
+        }
+        if (!($statement->execute($data)))
+            return null;
+        if (!($select = $statement->fetchAll(PDO::FETCH_ASSOC)))
+           return null;
+        return $select;
     }
 
     public function close()

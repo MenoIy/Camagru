@@ -11,193 +11,122 @@ class UserModel
 
     public function addUser($data)
     {
-        $query = "INSERT INTO `camagru_users` SET `user_login` = ? , `user_mail` = ?, `user_password` = ?, `account_status` = ?"; 
-        $password = hash('whirlpool', $data['passwd']);
-        if ($this->_database->execute($query, [$data['login'], $data['mail'], $password, 'Inactive']))
+        $query = "INSERT INTO `users` SET `user` = ? , `mail` = ?, `password` = ?, `status` = ? ,`notification` = ?"; 
+        $password = hash('whirlpool', $data['password']);
+        if ($this->_database->execute($query, [$data['user'], $data['mail'], $password, 'Inactive', 'Active']))
         {
-            $this->_addAccount($data['mail'], $data['login']);
-            return TRUE;
+            if(($token = $this->_addAccount($data['user'], $data['mail'])))
+                return ($token);
+            else
+            {
+                $query = "DELETE FROM users WHERE user = ?";
+                $this->_database->execute($query, [$data['user']]);
+                return (null);
+            }
         }
-        else
-            return FALSE;
-    }
-    public function getUserByLogin($login)
-    {
-        $query = "SELECT user_login from camagru_users WHERE user_login = ?";
-        $user = $this->_database->select($query, [$login]);
-        if (!$user)
-            return null;
-        else
-            return ($user['user_login']);
-    }
-    public function getUserByMail($mail)
-    {
-        $query = "SELECT user_login from camagru_users WHERE user_mail = ?";
-        $user = $this->_database->select($query, [$mail]);
-        if (!$user)
-            return null;
-        else
-            return ($user['user_login']);
+        return null;
     }
 
-    private function _addAccount($mail, $login)
+    private function _addAccount($user, $mail)
     {
-        $token = $this->_generateToken($mail, $login);
-        $query = "INSERT INTO `camagru_account` SET `account_login` = ?, `account_mail` = ? , `account_token` = ?"; 
-        if ($this->_database->execute($query, [$login, $mail, $token]))
-        {
-            return TRUE;
-        }
+        $token = $this->_generateToken($user, $mail);
+        $query = "INSERT INTO `accounts` SET `user` = ?, `mail` = ? , `token` = ?";
+        if ($this->_database->execute($query, [$user, $mail, $token]))
+            return $token;
         else
-            return FALSE;
+            return null;
     }
+
+    private function _generateToken($user, $mail)
+    {
+        $time = time();
+        $time = strval($time);
+        $token = $time.$mail.$user;
+        $token = str_shuffle($token);
+        $token = hash('whirlpool', $token);
+        return ($token);
+    }
+
+    public function getUser($user)
+    {
+        $query = "SELECT * from users WHERE user = ?";
+        if (!($data = $this->_database->select($query, [$user])))
+            return null;
+        else
+            return (count($data) == 0 ? null : $data);
+    }
+
 
     public function getAccountUser ($token)
     {
-        $query = "SELECT account_login from camagru_account WHERE account_token = ?";
-        $login = $this->_database->select($query, [$token]);
-        if (!$login)
-            return null;
-        else
-            return ($login['account_login']);
-    }
+        $query = "SELECT * from accounts WHERE token = ?";
+        if (!($data = $this->_database->select($query, [$token])))
+            return (null);
+        var_dump($data);
 
-    public function getAccountToken($login)
-    {
-        $query = "SELECT account_token from camagru_account WHERE account_login = ?";
-        $token = $this->_database->select($query, [$login]);
-        if (!$token)
-            return null;
-        else
-            return ($token['account_token']);
+            return (count($data) == 0 ? null : $data['user']);
     }
 
     public function updateUserStatus($user)
     {
-        $query = "UPDATE camagru_users SET account_status = 'active' WHERE user_login = ?";
+        $query = "UPDATE users SET `status` = 'active' WHERE user = ?"; 
         if ($this->_database->execute($query, [$user]))
         {
             if ($this->_deleteAccount($user))
-                return (TRUE);
-            else
-                return FALSE;
+                return (true);
         }
+        return false;
+    }
+
+    private function _deleteAccount($user)
+    {
+        $query = "DELETE FROM accounts WHERE user = ?";
+        if ($this->_database->execute($query, [$user]))
+            return TRUE;
         else
             return FALSE;
     }
 
-    private function _deleteAccount($login)
+    public function resetPassword($mail, $user)
     {
-        $query = "DELETE FROM camagru_account WHERE account_login = ?";
-        if ($this->_database->execute($query, [$login]))
-            return TRUE;
-        else
-        return FALSE;
+        $token = $this->_generateToken($user, $user);
+        $query = "INSERT INTO `accounts` SET `user` = ?, `mail` = ? , `token` = ?";
+        if ($this->_database->execute($query, [$user, $mail, $token]))
+            return $token;
+        return null;
     }
 
-    public function getUser($login)
+    public function updateUserPassword($user, $password, $token = null)
     {
-        $query = "SELECT * from camagru_users WHERE user_login = ?";
-        $user = $this->_database->select($query, [$login]);
-        if (!$user)
-            return null;
-        else
-            return ($user);
-
-    }
-
-    private function _generateToken($mail, $login)
-    {
-        $time = time();
-        $time = strval($time);
-        $token = $time.$mail.$login;
-        $token = str_shuffle($token);
-        $token = hash('whirlpool', $token);
-        return ($token);
-
-    }
-
-    public function resetAccountquery($mail, $login)
-    {
-        $token = $this->_generateToken($mail, $login);
-        $query = "INSERT INTO `camagru_account` SET `account_login` = ?, `account_mail` = ? , `account_token` = ?"; 
-        if ($this->_database->execute($query, [$login, $mail, $token]))
-        {
-            return TRUE;
-        }
-        else
-            return FALSE; 
-    }
-
-    public function updateUserPassword($user, $password, $token)
-    {
-        $query = "UPDATE camagru_users SET user_password = ? WHERE user_login = ?";
+        $query = "UPDATE users SET password = ? WHERE user = ?";
         if ($this->_database->execute($query, [$password, $user]))
         {
-            if ($token == FALSE)
-                return TRUE;
-            if ($token == TRUE && $this->_deleteAccount($user))
-               return (TRUE);
-            else
-                return FALSE;
+            if (isset($token))
+            {
+                if ($this->_deleteAccount($user))
+                    return true;
+                return false;
+            }
+            return true;
         }
-        else
-            return FALSE;
+        return false;
     }
 
-    public function updateUserMail($user, $mail)
+    public function updateUser($user, $new)
     {
-        $query = "UPDATE camagru_users SET user_mail = ? WHERE user_login = ?";
-        if ($this->_database->execute($query, [$mail, $user]))
-        {
+        $query = "UPDATE users comments likes SET user = ? WHERE user = ?";
+        if ($this->_database->execute($query, [$new, $user]))
             return TRUE;
-        }
-        else
-            return FALSE;
-        
-    }
-
-    public function updateUserLogin($user, $login)
-    {
-        $query = "UPDATE camagru_users SET user_login = ? WHERE user_login = ?";
-        if ($this->_database->execute($query, [$login, $user]))
-        {
-            return TRUE;
-        }
         else
             return FALSE;   
     }
-    public function addComment($comment, $user, $filename)
-    {
-        $query = "INSERT INTO comments SET `comment` = ?, `user` = ? , `filename` = ?"; 
-        if ($this->_database->execute($query, [$comment, $user, $filename]))
-        {
-            return TRUE;
-        }
-        else
-            return FALSE;  
-    }
 
-    public function addLike($user, $filename)
+    public function updateMail($user, $new)
     {
-        $query = "INSERT INTO likes SET `filename` = ?, `user` = ? "; 
-        if ($this->_database->execute($query, [$filename, $user]))
-        {
+        $query = "UPDATE users SET mail = ? WHERE user = ?";
+        if ($this->_database->execute($query, [$new, $user]))
             return TRUE;
-        }
         else
-            return FALSE;  
+            return FALSE;   
     }
-
-    public function deleteLike($user, $filename)
-    {
-        $query = "DELETE FROM likes WHERE `filename` = ? AND `user` = ? "; 
-        if ($this->_database->execute($query, [$filename, $user]))
-        {
-            return TRUE;
-        }
-        else
-            return FALSE; 
-    }
-
 }

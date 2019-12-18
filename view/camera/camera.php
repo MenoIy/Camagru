@@ -1,7 +1,7 @@
 <?php
     $images_path = "/public/images";
-    $imageModel = new ImageModel($db);
-    $images = $imageModel->getImages();
+    $imageController = new ImageController($db);
+    $images = $imageController->getImages();
 ?>
 <html>
 
@@ -56,7 +56,7 @@
 			</div>
 		</div>
 		<div class="preview">
-			<?php foreach ($images as $image):?>
+			<?php foreach ((array) $images as $image):?>
 			<form id="deleteForm" method="POST" action="?url=camera">
 				<div class="image">
 					<img src=<?= "$images_path/$image[filename]"?> />

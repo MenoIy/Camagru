@@ -1,7 +1,7 @@
 <?php
     $images_path = "/public/images";
-    $imageModel = new ImageModel($db);
-    $images = $imageModel->getImages();
+    $imageController = new ImageController($db);
+    $images = $imageController->getImages();
 ?>
 <html>
 
@@ -37,29 +37,29 @@
     </div>
     <div class="imagesList" id="imagesList">
         <?php
-            foreach ($images as $image):
-            $count = $imageModel->getLikeCount($image['filename']);
+            foreach ((array) $images as $image):
+            $count = $imageController->getLikeCount($image['filename']);
         ?>
         <div class="image">
             <img src=<?= "$images_path/$image[filename]"?> />
             <button class="comment_button" onclick="showComment('<?php echo $image['filename'] ?>')">Comment</button>
             <form class="like_form" method="POST" action="?url=home">
                 <button type="submit" class="like" name="like" value="like">
-                    <?php if ($imageModel->AlreadyLiked($_SESSION['loggued_on_user'], $image['filename']) == 0): ?>
-                    <span class="like_nonactive">&#x2661;</span>
+                    <?php if (!$imageController->alreadyLiked($_SESSION['loggued_on_user'], $image['filename'])): ?>
+                        <span class="like_nonactive">&#x2661;</span>
                     <?php else: ?>
-                    <span class="like_active">&#x2665;</span>
+                        <span class="like_active">&#x2665;</span>
                     <?php endif; ?>
                     <span><?="$count"?><span>
-                            <input type="hidden" name="action" value="like" />
-                            <input type="hidden" name="image" value=<?= "$image[filename]"?> />
+                    <input type="hidden" name="action" value="like" />
+                    <input type="hidden" name="image" value=<?= "$image[filename]"?> />
                 </button>
             </form>
             <div class="hidden" id=<?= "$image[filename]" ?>>
                 <div class="comments">
                     <?php
-                       $comments = $imageModel->getComments($image['filename']);
-                       foreach ($comments as $comment):
+                       $comments = $imageController->getComments($image['filename']);
+                       foreach ((array) $comments as $comment):
                        $commentaire = htmlspecialchars($comment['comment']);
                     ?>
                     <h5><?= "$comment[user] : $commentaire"
@@ -77,6 +77,13 @@
             </div>
         </div>
         <?php endforeach;?>
+        <div class="pagination">
+            <?php
+                $count = 0;  
+            ?>
+            <a href="#">&laquo;1&raquo;</a>
+            <?php ?>
+        </div>
     </div>
     <footer>
         <p style="text-align:right;font-family:monospace;"><i>&#169; kdaou camagru</i></p>

@@ -2,102 +2,75 @@
 
 class UserController
 {
-    private $_UserModel;
-    private $_Validator;
+    private $_userModel;
+    private $_validator;
     private $_ImageModel;
 
     public function __construct($db)
     {
-        $this->_UserModel = new UserModel($db);
-        $this->_Validator = new Validator();
+        $this->_userModel = new UserModel($db);
+        $this->_validator = new Validator();
         $this->_ImageModel = new ImageModel($db);
-        $db->execute("Use db_camagru", ['']);
+        $db->execute("Use db_camagru");
     }
-
+    
     public function addUser(array $data)
     {
-        if (!($this->_Validator->isLogin($data['login'])))
-        {
-            return [ "error_type" => "Invalid login" ];
-        }
-        if ($this->_Validator->isAlreadyRegistred($data['login'], $this->_UserModel))
-        {
-            return [ "error_type" => "Error Login already used !" ];
-        }
-        if (!($this->_Validator->isMail($data['mail'])))
-        {
-            return [ "error_type" => "Error Invalide mail !" ];
-        }
-        if (!($this->_Validator->isPassword($data['passwd'])))
-        {
-            return [ "error_type" => "Error Invalide password !" ];
-        }
-        $this->_UserModel->addUser($data);
-        $this->_sendConfirmationMail($this->_UserModel, $data['login'], $data['mail']);
-        return NULL;
+        if (!($this->_validator->isUser($data)))
+            return [ "error_type" => "Invalid Username"];
+        if ($user = $this->_userModel->getUser($data['user']))
+            return [ "error_type" => "Error Username already used !"];
+        if (!($this->_validator->isMail($data)))
+            return [ "error_type" => "Error Invalide mail !"];
+        if (!($this->_validator->isPassword($data)))
+            return [ "error_type" => "Error Invalide password !"];
+        if (!($token = $this->_userModel->addUser($data)))
+            return [ "error_type" => "Error Something wrong happened !"]; 
+        if (!($this->_sendConfirmationMail($data['mail'], $token)))
+            return [ "error_type" => "Error Can't send a confirmation mail !"]; 
+        return null;
     }
 
-    public function like($data)
-    {
-        if (!(isset($_SESSION['loggued_on_user'])))
-            return (["error_type"=> "Login to like"]);
-        else
-        {
-            if ($this->_ImageModel->AlreadyLiked($_SESSION['loggued_on_user'], $data['image']) == 1)
-                $this->_UserModel->deleteLike($_SESSION['loggued_on_user'], $data['image']);
-            else
-                $this->_UserModel->addLike($_SESSION['loggued_on_user'], $data['image']);
-        }
-        return (null);
-    }
-    public function comment($data)
-    {
-        if (!(isset($_SESSION['loggued_on_user'])))
-            return (["error_type"=> "Login to comment"]);
-        else
-        {
-            if (!($this->_Validator->isComment($data)))
-            {
-                return (null);
-            }
-            $this->_UserModel->addComment($data['comment'], $_SESSION['loggued_on_user'], $data['image']);
-        }
-        return (null);
-    }
-
-
-
-    private function _sendConfirmationMail($UserModel, $login, $mail)
+    private function _sendConfirmationMail($mail, $token)
     {       
-        $token = $UserModel->getAccountToken($login);
         $subject = "Account confirmation !";
         $message = "localhost/?url=verify&token=".$token ;
         $headers = "From camagru@kdaou";
-        mail($mail , $subject ,$message, $headers);
+        if (mail($mail , $subject ,$message, $headers))
+            return true;
+        return false;
     }
 
     public function verifyAccount($token)
     {
-        if (!($user = $this->_UserModel->getAccountUser($token)))
-            return FALSE;
-        if (!($this->_UserModel->updateUserStatus($user)))
-            return (FALSE);
-        return TRUE;
+        if (!($user = $this->_userModel->getAccountUser($token)))
+            return false;
+        if (!($this->_userModel->updateUserStatus($user)))
+            return false;
+        return true;
     }
 
     public function login($data)
     {
         $_SESSION['loggued_on_user'] = null;
-        $login = $data['login'];
-        $password = hash('whirlpool', $data['passwd']);
-        if (!($user = $this->_UserModel->getUser($login)))
-            return ["error_type" => "Invalide login"];
-        if (strcmp($password, $user['user_password']) != 0)
+        if (!($this->_validator->isUser($data)))
+        {
+            return [ "error_type" => "Invalid Username"];
+        } 
+        if (!($this->_validator->isPassword($data)))
+        {
+            return [ "error_type" => "Error Invalide password !"];
+        }
+        $user = $data['user'];
+        $password = hash('whirlpool', $data['password']);
+        if (!($ret = $this->_userModel->getUser($user)))
+            return ["error_type" => "Invalide Username"];
+        if (strcmp($password , $ret['password']) != 0)
             return ["error_type" => "Invalide password"];
-        if (strcmp($user['account_status'], 'active') != 0)
+        if (strcmp($ret['status'], 'active') != 0)
             return ["error_type" => "account non activated"];
-        $_SESSION['loggued_on_user'] = $login;
-        return (NULL);
+        $_SESSION['loggued_on_user'] = $user;
+        return null;        
     }
 
     public function logout()
@@ -107,22 +80,31 @@ class UserController
 
     public function resetPassword($data)
     {
-        $login = $data['login'];
+        if (!($this->_validator->isUser($data)))
+        {
+            return [ "error_type" => "Invalid Username"];
+        } 
+        if (!($this->_validator->isPassword($data)))
+        {
+            return [ "error_type" => "Error Invalide password !"];
+        }
+        $user = $data['user'];
         $mail = $data['mail'];
-        if (!($user = $this->_UserModel->getUser($login)))
-            return ["error_type" => "Invalide login"];
-        if (strcmp($user['account_status'], 'active') != 0)
-            return ["error_type" => "account non activated"];
-        if (strcmp($mail, $user['user_mail']) != 0)
+        if (!($ret = $this->_userModel->getUser($user)))
+            return ["error_type" => "Invalide Username"];
+        if (strcmp($mail, $ret['mail']) != 0)
             return ["error_type" => "Invalide mail"];
-        if (!($this->_UserModel->resetAccountquery($mail, $login)))
-            return ["error_type" => "something happend retry later !"];  
-        $this->_sendResetPasswordMail($this->_UserModel, $data['login'], $data['mail']);
+        if (strcmp($ret['status'], 'active') != 0)
+            return ["error_type" => "account non activated"];
+        if (!($token = $this->_userModel->resetPassword($mail, $user)))
+            return [ "error_type" => "Error Something wrong happened !"];
+        if (!($this->_sendResetPasswordMail($mail, $token)))
+            return [ "error_type" => "Error Can't send a Reset password mail !"]; 
         return null;
     }
-    private function _sendResetPasswordMail($UserModel, $login, $mail)
+
+    private function _sendResetPasswordMail($mail, $token)
     {       
-        $token = $UserModel->getAccountToken($login);
         $subject = "RESET PASSWORD !";
         $message = "localhost/?url=reset&token=".$token ;
         $headers = "From camagru@kdaou";
@@ -131,64 +113,57 @@ class UserController
 
     public function newPassword($data)
     {
-        if (!isset($_SESSION['token']) || $_SESSION['token'] === "")
+        if (isset($data['token']) && (!isset($_SESSION['token']) || $_SESSION['token'] === ""))
             $_SESSION['token'] = $data['token'];
-        if (!($this->_Validator->isPassword($data['passwd'])))
-            return [ "error_type" => "Error Invalide password !" ];
-        if (!($user = $this->_UserModel->getAccountUser($_SESSION['token'])))
+        if (!($this->_validator->isPassword($data['password'])))
+            return [ "error_type" => "Error Invalide password !"];
+        $password = hash('whirlpool', $data['password']);
+        if (!($ret = $this->_userModel->getAccountUser($token)))
             return ["error_type" => "invalide token"];
-        $password = hash('whirlpool', $data['passwd']);
-        if (!($this->_UserModel->updateUserPassword($user ,$password , true)))
-            return ["error_type" => "something happend retry later !"];
+        if (!($this->_userModel->updateUserPassword($ret['user'], $password)))
+            return [ "error_type" => "Error Something wrong happened !"];
         $_SESSION['token'] = "";
         return (null);
     }
 
-
-
     public function changeProfile($data)
     {
-        switch ($data['TASK']) 
+        $user = $_SESSION['loggued_on_user'];
+        switch ($data['TASK'])
         {
-            case 'CHANGE LOGIN':
-            {   
-                $login = $_SESSION['loggued_on_user'];
-                if (!($this->_Validator->isLogin($data['login'])))
-                    return [ "error_type" => "Error Invalide Login !" ];
-                if ($this->_Validator->isAlreadyRegistred($data['login'], $this->_UserModel))
-                {
-                    return [ "error_type" => "Error Login already used !" ];
-                }
-                if (!($this->_UserModel->updateUserLogin($login, $data['login'])))
+            case 'CHANGE LOGIN' :
+            {
+                if (!($this->_validator->isUser($data)))
+                    return [ "error_type" => "Invalid Username"];
+                if ($user = $this->_userModel->getUser($data['user']))
+                    return [ "error_type" => "Error Username already used !"];
+                if (!($this->_userModel->updateUser($user, $data['user'])))
                     return ["error_type" => "something happend retry later !"];
                 $_SESSION['loggued_on_user'] = $data['login'];
-                return ["error_type" => "Login changed ."];
+                return ["error_type" => "Username changed ."];
             }break;
-            case 'CHANGE PASSWORD':
+            case 'CHANGE MAIL' :
             {
-                $login = $_SESSION['loggued_on_user'];
-                if (!($this->_Validator->isPassword($data['passwd'])))
-                    return [ "error_type" => "Error Invalide password !" ];
-                $password = hash('whirlpool', $data['passwd']);
-                if (!($this->_UserModel->updateUserPassword($login, $password, false)))
-                    return ["error_type" => "something happend retry later !"];
-                return ["error_type" => "Password changed ."];
-            }break;
-            case 'CHANGE MAIL':
-            {
-                $login = $_SESSION['loggued_on_user'];
-                if (!($this->_Validator->isMail($data['mail'])))
-                    return [ "error_type" => "Error Invalide Mail !" ];
-                if (!($this->_UserModel->updateUserMail($login, $data['mail'])))
+                if (!($this->_validator->isMail($data)))
+                    return [ "error_type" => "Error Invalide mail !"];
+                if (!($this->_userModel->updateMail($user, $data['mail'])))
                     return ["error_type" => "something happend retry later !"];
                 return ["error_type" => "Mail changed ."];
             }break;
-            case 'RETURN':
+            case 'CHANGE PASSWORD' :
             {
-                return NULL;
+                if (!($this->_validator->isPassword($data)))
+                    return [ "error_type" => "Error Invalide password !"];
+                $password = hash('whirlpool', $data['passwd']);
+                if (!($this->_userModel->updatePassword($user, $password)))
+                    return ["error_type" => "something happend retry later !"];
+                return ["error_type" => "password changed ."];
+            }break ;
+            case 'RETURN' :
+            {
+                return null;
             }break;
-            return NULL;
+            return null;
         }
-        
     }
 }
