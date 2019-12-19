@@ -33,11 +33,29 @@
         <form method="POST" action='?url=profile'>
             <div class="container">
                 <label for="username"><b>Username</b></label>
-                <input type="text" placeholder="Enter Username" name="user">
+                <div class="block">
+                    <input type="text" placeholder="Enter Username" name="user" value="">
+                    <button type="submit" name="TASK" value="CHANGE LOGIN">Change Username</button>
+                </div>
                 <label for="email"><b>Address email</b></label>
-                <input type="text" placeholder="Enter Address Email" name="mail">
+                <div class="block">
+                    <input type="text" placeholder="Enter Address Email" name="mail" value ="">
+                    <button type="submit" name="TASK" value="CHANGE MAIL">Change Mail</button>
+                </div>
                 <label for="password"><b>Password</b></label>
-                <input type="password" placeholder="Enter Password" name="password">
+                <div class="block">
+                    <input type="password" placeholder="Enter Password" name="password" value="">
+                    <button type="submit" name="TASK" value="CHANGE PASSWORD">Change Password</button>
+                </div>
+                <label for="Notification"><b>Notification</b></label>
+                </br>
+                    <button class="Notif" type="submit" name="TASK" value="CHANGE NOTIFICATION">
+                        <?php 
+                            $userController = new UserController($db);
+                            $status = $userController->getStatus($_SESSION['loggued_on_user']);
+                            echo $status;
+                        ?>
+                    </button>
                 <button type="submit">Return</button>
             </div>
             <?php if (isset($errors["error_type"])): ?>

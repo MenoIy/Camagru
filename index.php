@@ -68,7 +68,7 @@ switch ($url)
 
 	case "home":
 	{
-		$error = null;
+		$errors = null;
 		switch($method)
 		{
 			case "POST" :
@@ -78,17 +78,29 @@ switch ($url)
 				{
 					case "like" :
 					{
-						$error = $imageController->like($_POST);
+						$errors = $imageController->like($_POST);
 					}break;
 					case "comment":
 					{
-						$error = $imageController->comment($_POST);  
+						$errors = $imageController->comment($_POST);  
 					}break;
 				}
 			}break;
 		}
-		if (isset($error))
-			require(__DIR__. '/view/login/login.php');
+		if (isset($errors))
+		{
+			switch($errors['error_type'])
+			{
+				case 'Login to Comment':
+				{
+					require(__DIR__. '/view/login/login.php');
+				}break;
+				default:
+				{
+					require(__DIR__ . '/view/home/home.php');
+				}break;
+			}
+		}
 		else
 			require(__DIR__ . '/view/home/home.php');
 	} break ;
@@ -99,7 +111,7 @@ switch ($url)
 			case "GET":
 			{
 				$UserController = new UserController($db);
-				if ($UserController->verifyAccount($_GET['token']))
+				if ($UserController->verifyAccount($_GET))
 					header("location: index.php?url=login");
 				else
 					echo "Account activation failed !";
@@ -161,7 +173,8 @@ switch ($url)
 			{
 				case "GET" :
 				{
-					$_SESSION['token'] = null;
+					if (isset($_GET['token']))
+						$_SESSION['token'] = $_GET['token'];
 				   // require(__DIR__ . '/view/reset_password/reset.php');
 				}break ;
 				case "POST":

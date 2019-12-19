@@ -9,10 +9,10 @@ class ImageModel
         $this->_database = $db_instance;
 	}
 	
-	public function saveImage($user, $filename)
+	public function saveImage($user, $filename, $time)
 	{
-		$query = "INSERT INTO `images` set `user` = ?, `filename` = ?";
-		if ($this->_database->execute($query, [$user, $filename]))
+		$query = "INSERT INTO `images` set `user` = ?, `filename` = ?, `time` = ?";
+		if ($this->_database->execute($query, [$user, $filename, $time]))
 			return true;
 		else
 			return false;
@@ -49,7 +49,7 @@ class ImageModel
             return FALSE;  
     }
 
-	private function deleteLikes($user, $filename)
+	public function deleteLike($user, $filename)
 	{
 		$query = "DELETE FROM likes WHERE `filename` = ? AND `user` = ?";
 		if ($this->_database->execute($query, [$filename, $user]))
@@ -66,9 +66,9 @@ class ImageModel
         return FALSE;  
 	}
 	
-	public function getImages()
+	public function getImages(int $start, int $limit)
 	{
-		$query = 'SELECT * from images ORDER BY `id` DESC';
+		$query = 'SELECT * from images ORDER BY `id` DESC LIMIT'.' '.$start.','.$limit;
 		if (!($images = $this->_database->selectAll($query)))
 			return null;
 		return (count($images) == 0 ? null : $images);
@@ -89,5 +89,21 @@ class ImageModel
 			return null;
 		else
 			return ($likes['COUNT(*)']);
+	}
+
+	public function getImagesCount()
+	{
+		$query = 'SELECT * from images';
+		if (!($images = $this->_database->selectAll($query)))
+			return 0;
+		return (count($images));
+	}
+
+	public function getUserImages($user)
+	{
+		$query = 'SELECT * from images WHERE user = ?  ORDER BY `time` DESC ';
+		if (!($images = $this->_database->selectAll($query, [$user])))
+			return null;
+		return (count($images) == 0 ? null : $images);	
 	}
 }

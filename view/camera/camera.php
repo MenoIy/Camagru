@@ -1,7 +1,7 @@
 <?php
     $images_path = "/public/images";
     $imageController = new ImageController($db);
-    $images = $imageController->getImages();
+    $images = $imageController->getUserImages();
 ?>
 <html>
 

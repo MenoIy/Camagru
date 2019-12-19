@@ -56,15 +56,21 @@ class UserModel
             return (count($data) == 0 ? null : $data);
     }
 
+    public function getStatus($user)
+    {
+        $query = "SELECT * from users WHERE user = ?";
+        if (!($data = $this->_database->select($query, [$user])))
+            return null;
+        else
+            return (count($data) == 0 ? null : $data['notification']);
+    }
 
     public function getAccountUser ($token)
     {
         $query = "SELECT * from accounts WHERE token = ?";
         if (!($data = $this->_database->select($query, [$token])))
             return (null);
-        var_dump($data);
-
-            return (count($data) == 0 ? null : $data['user']);
+        return (count($data) == 0 ? null : $data['user']);
     }
 
     public function updateUserStatus($user)
@@ -96,7 +102,7 @@ class UserModel
         return null;
     }
 
-    public function updateUserPassword($user, $password, $token = null)
+    public function updatePassword($user, $password, $token = null)
     {
         $query = "UPDATE users SET password = ? WHERE user = ?";
         if ($this->_database->execute($query, [$password, $user]))
@@ -114,16 +120,33 @@ class UserModel
 
     public function updateUser($user, $new)
     {
-        $query = "UPDATE users comments likes SET user = ? WHERE user = ?";
+        $query = "UPDATE users SET user = ? WHERE user = ?";
+        if (!($this->_database->execute($query, [$new, $user])))
+            return FALSE;
+        $query = "UPDATE likes SET user = ? WHERE user = ?";
+        if (!($this->_database->execute($query, [$new, $user])))
+            return FALSE;
+        $query = "UPDATE comments SET user = ? WHERE user = ?";
+        if (!($this->_database->execute($query, [$new, $user])))
+            return FALSE;
+        $query = "UPDATE images SET user = ? WHERE user = ?";
+        if (!($this->_database->execute($query, [$new, $user])))
+            return FALSE;
+        return TRUE;   
+    }
+
+    public function updateMail($user, $new)
+    {
+        $query = "UPDATE users SET mail = ? WHERE user = ?";
         if ($this->_database->execute($query, [$new, $user]))
             return TRUE;
         else
             return FALSE;   
     }
 
-    public function updateMail($user, $new)
+    public function updateNotification($user, $new)
     {
-        $query = "UPDATE users SET mail = ? WHERE user = ?";
+        $query = "UPDATE users SET `notification` = ? WHERE user = ?";
         if ($this->_database->execute($query, [$new, $user]))
             return TRUE;
         else

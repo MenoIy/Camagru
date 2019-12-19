@@ -74,7 +74,7 @@ footer {
 
 .image {
     display: block;
-    margin-top: 5px;
+    margin-top: 20px;
     margin-left: auto;
     margin-right: auto;
     width: 100%;
@@ -136,12 +136,18 @@ footer {
     border-color: #502B07;
     border-radius: 5px;
     font-family: cursive;
-    font-size: 20px;
+    font-size: 19px;
     background-color: #CBAA84;
     height: 50px;
     width: 19%;
 }
 
+h5
+{
+    padding: 3px;
+    margin-bottom: 2px;
+    margin-top : 2px
+}
 .like {
     border-style: solid;
     border-color: #502B07;
@@ -194,3 +200,23 @@ footer {
 .pagination a:hover {
     background-color: #F2D7B8;
 }
+.info
+{
+    border: solid;
+    border-color: #502B07;
+    border-radius: 5px;
+    background-color: #F2D7B8;
+    display: flex;
+    color : #502B07;
+}
+.info p
+{
+    margin-left: 10px;
+}
+
+.Error {
+    text-align: center;
+    font-size: 15px;
+    color: #502B07;
+}
+

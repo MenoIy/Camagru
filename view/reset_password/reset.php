@@ -28,7 +28,6 @@
     </div>
     <div>
         <form method="POST" action='?url=reset'>
-            <input type="hidden" name="token" value="<?= $_GET["token"] ?>">
             <div class="container">
                 <label for="password"><b>New Password</b></label>
                 <input type="password" placeholder="Enter New Password" name="password" required>

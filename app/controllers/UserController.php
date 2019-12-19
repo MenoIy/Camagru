@@ -41,9 +41,11 @@ class UserController
         return false;
     }
 
-    public function verifyAccount($token)
+    public function verifyAccount($data)
     {
-        if (!($user = $this->_userModel->getAccountUser($token)))
+        if (!isset($data['token']) || !is_string($data['token']))
+            return false;
+        if (!($user = $this->_userModel->getAccountUser($data['token'])))
             return false;
         if (!($this->_userModel->updateUserStatus($user)))
             return false;
@@ -54,13 +56,9 @@ class UserController
     {
         $_SESSION['loggued_on_user'] = null;
         if (!($this->_validator->isUser($data)))
-        {
             return [ "error_type" => "Invalid Username"];
-        } 
         if (!($this->_validator->isPassword($data)))
-        {
             return [ "error_type" => "Error Invalide password !"];
-        }
         $user = $data['user'];
         $password = hash('whirlpool', $data['password']);
         if (!($ret = $this->_userModel->getUser($user)))
@@ -81,13 +79,9 @@ class UserController
     public function resetPassword($data)
     {
         if (!($this->_validator->isUser($data)))
-        {
             return [ "error_type" => "Invalid Username"];
-        } 
-        if (!($this->_validator->isPassword($data)))
-        {
-            return [ "error_type" => "Error Invalide password !"];
-        }
+        if (!($this->_validator->isMail($data)))
+            return [ "error_type" => "Error Invalide Mail !"];
         $user = $data['user'];
         $mail = $data['mail'];
         if (!($ret = $this->_userModel->getUser($user)))
@@ -108,27 +102,39 @@ class UserController
         $subject = "RESET PASSWORD !";
         $message = "localhost/?url=reset&token=".$token ;
         $headers = "From camagru@kdaou";
-        mail($mail , $subject ,$message, $headers);
+        if (mail($mail , $subject ,$message, $headers))
+            return true;
+        return false;
     }
 
     public function newPassword($data)
     {
-        if (isset($data['token']) && (!isset($_SESSION['token']) || $_SESSION['token'] === ""))
-            $_SESSION['token'] = $data['token'];
-        if (!($this->_validator->isPassword($data['password'])))
+        $token = $_SESSION['token'];
+        if (!($this->_validator->isPassword($data)))
             return [ "error_type" => "Error Invalide password !"];
         $password = hash('whirlpool', $data['password']);
-        if (!($ret = $this->_userModel->getAccountUser($token)))
+        if (!($user = $this->_userModel->getAccountUser($token)))
             return ["error_type" => "invalide token"];
-        if (!($this->_userModel->updateUserPassword($ret['user'], $password)))
+        if (!($this->_userModel->updatePassword($user, $password, $token)))
             return [ "error_type" => "Error Something wrong happened !"];
         $_SESSION['token'] = "";
         return (null);
     }
 
+    public function getStatus($user)
+    {
+        if (!isset($user) || !is_string($user))
+            return ('Undefined');
+        if (!($status = $this->_userModel->getStatus($user)))
+            return ('Undefined');
+        return ($status);
+    }
+
     public function changeProfile($data)
     {
         $user = $_SESSION['loggued_on_user'];
+        if (!isset($data['TASK']) || !is_string($data['TASK']))
+            return null;
         switch ($data['TASK'])
         {
             case 'CHANGE LOGIN' :
@@ -137,9 +143,9 @@ class UserController
                     return [ "error_type" => "Invalid Username"];
                 if ($user = $this->_userModel->getUser($data['user']))
                     return [ "error_type" => "Error Username already used !"];
-                if (!($this->_userModel->updateUser($user, $data['user'])))
+                if (!($this->_userModel->updateUser($_SESSION['loggued_on_user'], $data['user'])))
                     return ["error_type" => "something happend retry later !"];
-                $_SESSION['loggued_on_user'] = $data['login'];
+                $_SESSION['loggued_on_user'] = $data['user'];
                 return ["error_type" => "Username changed ."];
             }break;
             case 'CHANGE MAIL' :
@@ -154,11 +160,19 @@ class UserController
             {
                 if (!($this->_validator->isPassword($data)))
                     return [ "error_type" => "Error Invalide password !"];
-                $password = hash('whirlpool', $data['passwd']);
+                $password = hash('whirlpool', $data['password']);
                 if (!($this->_userModel->updatePassword($user, $password)))
                     return ["error_type" => "something happend retry later !"];
                 return ["error_type" => "password changed ."];
             }break ;
+            case 'CHANGE NOTIFICATION' :
+            {
+                $status = $this->getStatus($user);
+                $new = (strcmp($status, 'Active') == 0) ? 'Inactive' :  'Active';
+                if (!($this->_userModel->updateNotification($user, $new)))
+                    return ["error_type" => "something happend retry later !"];
+                return ["error_type" => "notification changed changed ."];
+            }break ; 
             case 'RETURN' :
             {
                 return null;

@@ -32,7 +32,8 @@ CREATE TABLE `images`
 (
     `id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `user` varchar(24) NOT NULL,
-    `filename` varchar(255) NOT NULL
+    `filename` varchar(255) NOT NULL,
+    `time` INT NOT NULL
 );
 
 CREATE TABLE `comments`
