@@ -169,6 +169,4 @@ class ImageController
         return ($this->_imageModel->getUserImages($user)); 
     }
 
-
-
 }

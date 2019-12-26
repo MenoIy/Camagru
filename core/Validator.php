@@ -48,5 +48,12 @@ class Validator
             return TRUE;
         return FALSE;
     }
+
+    public function isImage($image)
+    {
+        if (exif_imagetype($image))
+            return TRUE;
+        return FALSE;
+    }
 }
 ?>
